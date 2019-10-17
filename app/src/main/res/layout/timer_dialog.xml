@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="180dp"
+    android:layout_gravity="bottom">
+
+    <LinearLayout
+        android:layout_width="500dp"
+        android:layout_height="180dp"
+        android:orientation="vertical"
+        android:background="#cc232339">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="left">
+
+                <Button
+                    android:id="@+id/close_timer"
+                    android:layout_width="29dp"
+                    android:layout_height="29dp"
+                    android:layout_marginLeft="14dp"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/ic_no"
+                    android:textColor="#0000ff"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="25dp"
+                    android:textSize="16sp"
+                    android:fontFamily="sans-serif"
+                    android:textStyle="normal"
+                    android:textColor="#ffffff"
+                    android:letterSpacing="0.06"
+                    android:text="Countdown" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="right">
+
+                <Button
+                    android:id="@+id/confirm_timer"
+                    android:layout_width="29dp"
+                    android:layout_height="29dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@drawable/ic_yes"
+                    android:textColor="#0000ff"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="23dp"
+                android:layout_height="match_parent">
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="left">
+
+                <Button
+                    android:id="@+id/Button1"
+                    android:layout_width="51dp"
+                    android:layout_height="28dp"
+                    android:layout_marginTop="22dp"
+                    android:background="@drawable/btn_selector"
+                    android:text="off"
+                    android:letterSpacing="0.06"
+                    android:textColor="#ffffff"
+                    android:textStyle="normal"
+                    android:textSize="13sp"
+                    />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="left">
+
+                <Button
+                    android:id="@+id/Button2"
+                    android:layout_width="51dp"
+                    android:layout_height="28dp"
+                    android:layout_marginTop="22dp"
+                    android:background="@drawable/btn_selector"
+                    android:text="3s"
+                    android:letterSpacing="0.06"
+                    android:textColor="#ffffff"
+                    android:textStyle="normal"
+                    android:textSize="13sp"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal">
+
+                <Button
+                    android:id="@+id/Button3"
+                    android:layout_width="51dp"
+                    android:layout_height="28dp"
+                    android:layout_marginTop="22dp"
+                    android:background="@drawable/btn_selector"
+                    android:text="5s"
+                    android:letterSpacing="0.06"
+                    android:textColor="#ffffff"
+                    android:textStyle="normal"
+                    android:textSize="13sp"
+                    />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="right">
+
+                <Button
+                    android:id="@+id/Button4"
+                    android:layout_width="51dp"
+                    android:layout_height="28dp"
+                    android:layout_marginTop="22dp"
+                    android:background="@drawable/btn_selector"
+                    android:text="10s"
+                    android:letterSpacing="0.06"
+                    android:textColor="#ffffff"
+                    android:textStyle="normal"
+                    android:textSize="13sp"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="right">
+
+                <Button
+                    android:id="@+id/Button5"
+                    android:layout_width="51dp"
+                    android:layout_height="28dp"
+                    android:layout_marginTop="22dp"
+                    android:background="@drawable/btn_selector"
+                    android:text="15s"
+                    android:letterSpacing="0.06"
+                    android:textColor="#ffffff"
+                    android:textStyle="normal"
+                    android:textSize="13sp"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="20dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="right">
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>
+
