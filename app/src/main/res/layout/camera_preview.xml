@@ -1,5 +1,6 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -24,16 +25,17 @@
         android:layout_marginTop="31dp"
         android:src="@drawable/ic_back"/>
     <FrameLayout
-        android:layout_width="115dp"
-        android:layout_height="166.8dp"
-        android:layout_marginLeft="13dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="74.1dp">
 
         <ImageView
-            android:id="@+id/image_View"
+            android:id="@+id/thumb_button_1"
             android:layout_width="115dp"
             android:layout_height="166.8dp"
-            android:src="@drawable/picture_demo"/>
+            android:layout_marginLeft="13dp"
+            android:src="@drawable/picture_demo"
+            android:scaleType="centerCrop"/>
 
         <ImageView
             android:id="@+id/picture_button"
@@ -44,6 +46,12 @@
             android:src="@drawable/ic_enlarge_picture"
             android:onClick="pictureControl"/>
     </FrameLayout>
+
+    <ImageView
+        android:id="@+id/expanded_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
 
     <ImageView
@@ -160,15 +168,33 @@
         android:lineSpacingExtra="8sp"
         android:text="Flash" />
 
-    <com.example.magidemo.CircleProgressBar
-        android:id="@+id/custom_progressBar"
-        android:layout_height="100dp"
-        android:layout_width="100dp"
-        app:progress="0"
-        app:progressBarThickness="7dp"
+    <ImageView
+        android:id="@+id/record_video"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/ic_record_video"
         android:layout_alignParentBottom="true"
         android:layout_centerInParent="true"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginBottom="47dp"/>
+    <ImageView
+        android:id="@+id/stop_record"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/ic_stop_record"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="47dp"
+        android:visibility="gone"/>
+
+    <!--<com.example.magidemo.CircleProgressBar-->
+        <!--android:id="@+id/custom_progressBar"-->
+        <!--android:layout_height="100dp"-->
+        <!--android:layout_width="100dp"-->
+        <!--app:progress="0"-->
+        <!--app:progressBarThickness="7dp"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_centerInParent="true"-->
+        <!--android:layout_marginBottom="10dp"/>-->
 
 </RelativeLayout>
 

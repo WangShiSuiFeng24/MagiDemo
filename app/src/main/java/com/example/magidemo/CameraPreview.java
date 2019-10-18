@@ -5,6 +5,10 @@ package com.example.magidemo;
  */
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -16,6 +20,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.hardware.Camera;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -36,6 +41,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -85,7 +91,11 @@ public class CameraPreview extends Activity {
     private Bitmap rotatedBitmap;
     private RelativeLayout captureMedia;
     private FrameLayout editMedia;
-    private CircleProgressBar customButton;
+//    private CircleProgressBar customButton;
+
+    private ImageView recordVideo;
+    private ImageView stopRecord;
+
     private ImageView switchCameraBtn;
     private ImageView flashButton;
 
@@ -113,15 +123,15 @@ public class CameraPreview extends Activity {
 
     private MediaController mediaController;
 
-    //图片放大缩小
-    Bitmap bp=null;
-    ImageView imageView;
-    float scaleWidth;
-    float scaleHeight;
 
-    int h;
-    boolean num=false;
+    // Hold a reference to the current animator,
+    // so that it can be canceled mid-way.
+    private Animator currentAnimator;
 
+    // The system "short" animation time duration, in milliseconds. This
+    // duration is ideal for subtle animations or animations that occur
+    // very frequently.
+    private int shortAnimationDuration;
 
 
 
@@ -131,34 +141,23 @@ public class CameraPreview extends Activity {
         setContentView(R.layout.camera_preview);
         GetPermission();
 
-        //图片放大缩小
-        Display display = getWindowManager().getDefaultDisplay();
+        // Hook up clicks on the thumbnail views.
 
-        Point size =new Point();
-        display.getSize(size);
+//        final View thumb1View = findViewById(R.id.thumb_button_1);
+//        View thumb1View = findViewById(R.id.thumb_button_1);
 
-        // 加载mageView和获得图片的信i息
-        imageView = (ImageView) findViewById(R.id.image_View);
-        bp = BitmapFactory.decodeResource(getResources(),R.drawable.picture_demo);
-        int bitmapWidth = bp.getWidth();
-        int bitmapHeight = bp.getHeight();
 
-        // 获得屏幕的宽高
-        int screenWidth = size.x;
-        int screenHeight = size.y;
-
-        // 计算缩放比，因为如果图片的尺寸超过屏幕，那么就会自动匹配到屏幕的尺寸去显示。
-        // 那么，我们就不知道图片实际上在屏幕上显示的宽高，所以先计算需要全部显示的缩放比，
-        // 在去计算图片显示时候的实际宽高，然后，才好进行下一步的缩放。
-        // 要不然，会导致缩小和放大没效果，或者内存泄漏等等
-        scaleWidth = ((float)screenWidth) / bitmapWidth;
-        scaleHeight = ((float)screenHeight) / bitmapHeight;
-        imageView.setImageBitmap(bp);
+        // Retrieve and cache the system's default "short" animation time.
+        shortAnimationDuration = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
 
         captureMedia = (RelativeLayout) findViewById(R.id.camera_view);
         editMedia = (FrameLayout) findViewById(R.id.edit_media);
-        customButton = (CircleProgressBar) findViewById(R.id.custom_progressBar);
+//        customButton = (CircleProgressBar) findViewById(R.id.custom_progressBar);
+
+        recordVideo = (ImageView) findViewById(R.id.record_video);
+        stopRecord = (ImageView) findViewById(R.id.stop_record);
+
         switchCameraBtn = (ImageView) findViewById(R.id.img_switch_camera);
         flashButton = (ImageView) findViewById(R.id.img_flash_control);
 
@@ -215,8 +214,52 @@ public class CameraPreview extends Activity {
 //            }
 //        });
 
+        recordVideo.setOnClickListener(new View.OnClickListener() {
 
+            private Timer timer = new Timer();
+            private long LONG_PRESS_TIMEOUT = 1000;
+            private boolean wasLong = false;
 
+            @Override
+            public void onClick(View v) {
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        wasLong = true;
+                        // touch & hold was long
+                        Log.i("Click","touch & hold was long");
+                        VideoCountDown.start();
+                        try {
+                            startRecording();
+                        } catch (IOException e) {
+                            String message = e.getMessage();
+                            Log.i(null, "Problem " + message);
+                            mediaRecorder.release();
+                            e.printStackTrace();
+                        }
+                    }
+                }, LONG_PRESS_TIMEOUT);
+                recordVideo.setVisibility(View.GONE);
+                stopRecord.setVisibility(View.VISIBLE);
+
+            }
+        });
+
+        stopRecord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopRecording();
+                VideoCountDown.cancel();
+                VideoSeconds = 1;
+                //customButton.setProgressWithAnimation(0);
+                //wasLong = false;
+
+                stopRecord.setVisibility(View.GONE);
+                recordVideo.setVisibility(View.VISIBLE);
+            }
+        });
+
+        /*
         customButton.setOnTouchListener(new View.OnTouchListener() {
 
             private Timer timer = new Timer();
@@ -288,6 +331,7 @@ public class CameraPreview extends Activity {
                 return false;
             }
         });
+        */
 
         //点击preview调用聚焦方法
         preview.setOnClickListener(new View.OnClickListener() {
@@ -384,13 +428,13 @@ public class CameraPreview extends Activity {
         public void onTick(long millisUntilFinished) {
             VideoSeconds++;
             int VideoSecondsPercentage = VideoSeconds * 10;
-            customButton.setProgressWithAnimation(VideoSecondsPercentage);
+//            customButton.setProgressWithAnimation(VideoSecondsPercentage);
         }
 
         @Override
         public void onFinish() {
             stopRecording();
-            customButton.setProgress(0);
+//            customButton.setProgress(0);
             VideoSeconds = 0;
         }
     };
@@ -656,34 +700,171 @@ public class CameraPreview extends Activity {
 
     //图片放大缩小控制
     public void pictureControl(View v) {
+
+        final View thumb1View = findViewById(R.id.thumb_button_1);
+
+        float startScale = 0f;
+        final ImageView expandedImageView = (ImageView) findViewById(R.id.expanded_image);
+        final Rect startBounds = new Rect();
+
+
         Log.i("picture", "picture button clicked!");
         if(!isPictureEnlarge) {
             isPictureEnlarge = true;
             pictureButton.setImageResource(R.drawable.ic_shrink_picture);
 
-
-            Matrix matrix = new Matrix();
-            matrix.postScale(scaleWidth,scaleHeight);
-
-            Bitmap newBitmap = Bitmap.createBitmap(bp, 0, 0, bp.getWidth(), bp.getHeight(), matrix, true);
-            imageView.setImageBitmap(newBitmap);
-            num = false;
-
+            expandImageView(thumb1View,startScale,expandedImageView,startBounds);
 
             Log.i("picture","picture enlarged");
         } else {
             isPictureEnlarge = false;
             pictureButton.setImageResource(R.drawable.ic_enlarge_picture);
 
-            Matrix matrix = new Matrix();
-            matrix.postScale(1.0f,1.0f);
-            Bitmap newBitmap = Bitmap.createBitmap(bp, 0, 0, bp.getWidth(), bp.getHeight(), matrix, true);
-            imageView.setImageBitmap(newBitmap);
-            num = true;
+            shrinkImageView(thumb1View,startScale,expandedImageView,startBounds);
 
 
             Log.i("picture","picture shrinked");
         }
+    }
+
+    //动画放大
+    public void expandImageView(final View thumb1View,float startScale,final ImageView expandedImageView,Rect startBounds) {
+        // If there's an animation in progress, cancel it
+        // immediately and proceed with this one.
+        if (currentAnimator != null) {
+            currentAnimator.cancel();
+        }
+
+        // Load the high-resolution "zoomed-in" image.
+//            final ImageView expandedImageView = (ImageView) findViewById(R.id.expanded_image);
+        expandedImageView.setImageResource(R.drawable.picture_demo);
+
+        // Calculate the starting and ending bounds for the zoomed-in image.
+        // This step involves lots of math. Yay, math.
+//            final Rect startBounds = new Rect();
+        final Rect finalBounds = new Rect();
+        final Point globalOffset = new Point();
+
+        // The start bounds are the global visible rectangle of the thumbnail,
+        // and the final bounds are the global visible rectangle of the container
+        // view. Also set the container view's offset as the origin for the
+        // bounds, since that's the origin for the positioning animation
+        // properties (X, Y).
+        thumb1View.getGlobalVisibleRect(startBounds);
+        findViewById(R.id.container)
+                .getGlobalVisibleRect(finalBounds, globalOffset);
+        startBounds.offset(-globalOffset.x, -globalOffset.y);
+        finalBounds.offset(-globalOffset.x, -globalOffset.y);
+
+        // Adjust the start bounds to be the same aspect ratio as the final
+        // bounds using the "center crop" technique. This prevents undesirable
+        // stretching during the animation. Also calculate the start scaling
+        // factor (the end scaling factor is always 1.0).
+//            float startScale;
+        if ((float) finalBounds.width() / finalBounds.height()
+                > (float) startBounds.width() / startBounds.height()) {
+            // Extend start bounds horizontally
+            startScale = (float) startBounds.height() / finalBounds.height();
+            float startWidth = startScale * finalBounds.width();
+            float deltaWidth = (startWidth - startBounds.width()) / 2;
+            startBounds.left -= deltaWidth;
+            startBounds.right += deltaWidth;
+        } else {
+            // Extend start bounds vertically
+            startScale = (float) startBounds.width() / finalBounds.width();
+            float startHeight = startScale * finalBounds.height();
+            float deltaHeight = (startHeight - startBounds.height()) / 2;
+            startBounds.top -= deltaHeight;
+            startBounds.bottom += deltaHeight;
+        }
+
+        // Hide the thumbnail and show the zoomed-in view. When the animation
+        // begins, it will position the zoomed-in view in the place of the
+        // thumbnail.
+        thumb1View.setAlpha(0f);
+        expandedImageView.setVisibility(View.VISIBLE);
+
+        // Set the pivot point for SCALE_X and SCALE_Y transformations
+        // to the top-left corner of the zoomed-in view (the default
+        // is the center of the view).
+        expandedImageView.setPivotX(0f);
+        expandedImageView.setPivotY(0f);
+
+        // Construct and run the parallel animation of the four translation and
+        // scale properties (X, Y, SCALE_X, and SCALE_Y).
+        AnimatorSet set = new AnimatorSet();
+        set
+                .play(ObjectAnimator.ofFloat(expandedImageView, View.X,
+                        startBounds.left, finalBounds.left))
+                .with(ObjectAnimator.ofFloat(expandedImageView, View.Y,
+                        startBounds.top, finalBounds.top))
+                .with(ObjectAnimator.ofFloat(expandedImageView, View.SCALE_X,
+                        startScale, 1f))
+                .with(ObjectAnimator.ofFloat(expandedImageView,
+                        View.SCALE_Y, startScale, 1f))
+                .with(ObjectAnimator.ofFloat(expandedImageView, "alpha", 1f, 0.3f));
+        set.setDuration(shortAnimationDuration);
+        set.setInterpolator(new DecelerateInterpolator());
+        set.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                currentAnimator = null;
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                currentAnimator = null;
+            }
+        });
+        set.start();
+        currentAnimator = set;
+    }
+
+    //动画缩小
+    public void shrinkImageView(final View thumb1View,float startScale,final ImageView expandedImageView,Rect startBounds) {
+        // Upon clicking the zoomed-in image, it should zoom back down
+        // to the original bounds and show the thumbnail instead of
+        // the expanded image.
+        final float startScaleFinal = startScale;
+
+        if (currentAnimator != null) {
+            currentAnimator.cancel();
+        }
+
+        // Animate the four positioning/sizing properties in parallel,
+        // back to their original values.
+        AnimatorSet set = new AnimatorSet();
+        set.play(ObjectAnimator
+                .ofFloat(expandedImageView, View.X, startBounds.left))
+                .with(ObjectAnimator
+                        .ofFloat(expandedImageView,
+                                View.Y,startBounds.top))
+                .with(ObjectAnimator
+                        .ofFloat(expandedImageView,
+                                View.SCALE_X, startScaleFinal))
+                .with(ObjectAnimator
+                        .ofFloat(expandedImageView,
+                                View.SCALE_Y, startScaleFinal))
+                .with(ObjectAnimator.ofFloat(expandedImageView, "alpha", 0.3f, 1f));;
+        set.setDuration(shortAnimationDuration);
+        set.setInterpolator(new DecelerateInterpolator());
+        set.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                thumb1View.setAlpha(1f);
+                expandedImageView.setVisibility(View.GONE);
+                currentAnimator = null;
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                thumb1View.setAlpha(1f);
+                expandedImageView.setVisibility(View.GONE);
+                currentAnimator = null;
+            }
+        });
+        set.start();
+        currentAnimator = set;
     }
 
     public void switchCamera() {
@@ -721,6 +902,12 @@ public class CameraPreview extends Activity {
         Button closeTimer = (Button) view.findViewById(R.id.close_timer);
         Button confirmTimer = (Button) view.findViewById(R.id.confirm_timer);
 
+        final Button button1 = (Button) view.findViewById(R.id.Button1);
+        Button button2 = (Button) view.findViewById(R.id.Button2);
+        Button button3 = (Button) view.findViewById(R.id.Button3);
+        Button button4 = (Button) view.findViewById(R.id.Button4);
+        Button button5 = (Button) view.findViewById(R.id.Button5);
+
 
         //显示
        dialog.show();
@@ -733,38 +920,10 @@ public class CameraPreview extends Activity {
 // 设置宽度
         layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
         dialogWindow.setAttributes(layoutParams);
-// 给 DecorView 设置背景颜色，很重要，不然导致 Dialog 内容显示不全，有一部分内容会充当 padding，上面例子有举出
-//        dialogwindow.getDecorView().setBackgroundColor(0xcc232339);
+
         dialogWindow.setWindowAnimations(R.style.dialog_animation);
 
-//        getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
-
-
- //       Window dialogWindow = dialog.getWindow();
- //       WindowManager.LayoutParams lp = dialogWindow.getAttributes();
         dialogWindow.setGravity(Gravity.BOTTOM);
-//
-//        dialogWindow.getDecorView().setPadding(0, 0, 0, 0);
-//
-//        dialogWindow.setWindowAnimations(R.style.dialog_animation);
-
-//        WindowManager m = getWindowManager();
-//        Display d = m.getDefaultDisplay(); // 获取屏幕宽、高用
-        //WindowManager.LayoutParams p = getWindow().getAttributes(); // 获取对话框当前的参数值
-        //lp.gravity = Gravity.BOTTOM;
-//        lp.height = WindowManager.LayoutParams.WRAP_CONTENT; // 高度设置为屏幕的0.6
-//        lp.width = WindowManager.LayoutParams.MATCH_PARENT; // 宽度设置为屏幕的0.95
-        //dialogWindow.setAttributes(p);
-
-        //getWindow().getDecorView().setPadding(0, 0, 0, 0);
-
-//        lp.x = 100; // 新位置X坐标
-//        lp.y = 100; // 新位置Y坐标
-        //lp.width = ScreenUtils.getScreenWidth(CameraPreview.this); // 宽度
-        //lp.height = 180; // 高度
-//        lp.alpha = 0.7f; // 透明度
-
-//        dialogWindow.setAttributes(lp);
 
         closeTimer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -779,21 +938,19 @@ public class CameraPreview extends Activity {
                 dialog.dismiss();
             }
         });
-
-
-
-
-
-
-
-        //dialog.getWindow().setLayout((ScreenUtils.getScreenWidth(this)/32*9),LinearLayout.LayoutParams.WRAP_CONTENT);
+//        button1.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                button1.setBackground();
+//            }
+//        });
     }
 
     //弹出Guide对话框
     public void showGuide() {
         View view = LayoutInflater.from(this).inflate(R.layout.guide_dialog,null,false);
 
-        AlertDialog.Builder guideDialog = new AlertDialog.Builder(CameraPreview.this,R.style.MyDialog1);
+        AlertDialog.Builder guideDialog = new AlertDialog.Builder(CameraPreview.this);
         guideDialog.setView(view);//加载进去
         final AlertDialog dialog = guideDialog.create();
 
@@ -806,10 +963,10 @@ public class CameraPreview extends Activity {
         dialog.show();
         video_view.start();
         //自定义的东西
-        Window dialogWindow = dialog.getWindow();
-        WindowManager.LayoutParams lp = dialogWindow.getAttributes();
-        dialogWindow.setGravity(Gravity.CENTER);
-        dialogWindow.setAttributes(lp);
+//        Window dialogWindow = dialog.getWindow();
+//        WindowManager.LayoutParams lp = dialogWindow.getAttributes();
+//        dialogWindow.setGravity(Gravity.CENTER);
+//        dialogWindow.setAttributes(lp);
 
         cancle_video.setVisibility(View.VISIBLE);
         cancle_video.setOnClickListener(new View.OnClickListener() {
