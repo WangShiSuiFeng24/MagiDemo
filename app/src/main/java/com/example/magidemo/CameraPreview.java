@@ -103,7 +103,6 @@ public class CameraPreview extends Activity {
 
     private VideoView videoView;
     int VideoSeconds = 1;
-//    int noti_id;
 
     private ImageView guide;
     private ImageView timer;
@@ -167,8 +166,6 @@ public class CameraPreview extends Activity {
         previewHolder.addCallback(surfaceCallback);
         previewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
-//        noti_id = (int) ((new Date().getTime()/1000L)%Integer.MAX_VALUE);
-
         guide = (ImageView)findViewById(R.id.img_guide);
         timer = (ImageView)findViewById(R.id.img_timer);
 
@@ -190,13 +187,11 @@ public class CameraPreview extends Activity {
             }
         }
 
-
         //开始录像
         recordVideo.setOnClickListener(new View.OnClickListener() {
 
             private Timer timer = new Timer();
             private long LONG_PRESS_TIMEOUT = 1000;
-//            private boolean wasLong = false;
 
             @Override
             public void onClick(View v) {
@@ -821,12 +816,51 @@ public class CameraPreview extends Activity {
                 dialog.dismiss();
             }
         });
-//        button1.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                button1.setBackground();
-//            }
-//        });
+
+        button1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                v.setFocusable(true);
+                v.requestFocus();
+                v.requestFocusFromTouch();
+            }
+        });
+
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                v.setFocusable(true);
+                v.requestFocus();
+                v.requestFocusFromTouch();
+            }
+        });
+
+        button3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                v.setFocusable(true);
+                v.requestFocus();
+                v.requestFocusFromTouch();
+            }
+        });
+
+        button4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                v.setFocusable(true);
+                v.requestFocus();
+                v.requestFocusFromTouch();
+            }
+        });
+
+        button5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                v.setFocusable(true);
+                v.requestFocus();
+                v.requestFocusFromTouch();
+            }
+        });
     }
 
     //弹出Guide对话框
