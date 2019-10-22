@@ -16,8 +16,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen">
-        <activity android:name=".CameraPreview"
-            android:screenOrientation="portrait">
+        <activity android:name=".CameraPreview">
+<!--            android:screenOrientation="portrait">-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

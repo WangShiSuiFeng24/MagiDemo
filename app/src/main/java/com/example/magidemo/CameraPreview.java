@@ -789,7 +789,7 @@ public class CameraPreview extends Activity {
 
         //显示
        dialog.show();
-        //自定义的东西
+        //自定义的东
 
         Window dialogWindow = dialog.getWindow();
 // 把 DecorView 的默认 padding 取消，同时 DecorView 的默认大小也会取消
@@ -867,7 +867,7 @@ public class CameraPreview extends Activity {
     public void showGuide() {
         View view = LayoutInflater.from(this).inflate(R.layout.guide_dialog,null,false);
 
-        AlertDialog.Builder guideDialog = new AlertDialog.Builder(CameraPreview.this,R.style.MyDialog);
+        AlertDialog.Builder guideDialog = new AlertDialog.Builder(CameraPreview.this);
         guideDialog.setView(view);//加载进去
         final AlertDialog dialog = guideDialog.create();
 
@@ -880,9 +880,6 @@ public class CameraPreview extends Activity {
 
 
         dialog.show();
-
-        Window dialogWindow = dialog.getWindow();
-        dialogWindow.setBackgroundDrawableResource(R.color.transparent);
 
         video_view.start();
 

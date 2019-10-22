@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/black">
+    android:background="@color/black"
+    tools:context="com.example.magidemo.CameraPreview">
 <RelativeLayout
     android:id="@+id/camera_view"
     android:layout_width="match_parent"
@@ -19,30 +20,37 @@
     <ImageView
         android:layout_width="28dp"
         android:layout_height="28dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
         android:layout_marginLeft="9dp"
         android:layout_marginTop="31dp"
         android:src="@drawable/ic_back"/>
 
 
-    <ImageView
+    <android.support.v7.widget.CardView
         android:id="@+id/thumb_button_1"
-        android:layout_width="115dp"
-        android:layout_height="166.8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="13dp"
         android:layout_marginTop="74.1dp"
-        android:src="@drawable/picture_demo"
-        />
 
-    <ImageView
-        android:id="@+id/picture_button"
-        android:layout_width="31dp"
-        android:layout_height="31dp"
-        android:layout_marginLeft="25dp"
-        android:layout_marginTop="76dp"
-        android:src="@drawable/ic_enlarge_picture"
-        android:onClick="pictureControl"/>
+        app:cardCornerRadius="7.2dp"
+        app:cardElevation="20dp" >
+
+        <ImageView
+            android:layout_width="115dp"
+            android:layout_height="180dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/picture_demo" />
+
+        <ImageView
+            android:id="@+id/picture_button"
+            android:layout_width="31dp"
+            android:layout_height="31dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginTop="1.9dp"
+            android:src="@drawable/ic_enlarge_picture"
+            android:visibility="visible"
+            android:onClick="pictureControl"/>
+    </android.support.v7.widget.CardView>
 
 
     <ImageView
