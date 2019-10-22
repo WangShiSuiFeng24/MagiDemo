@@ -24,34 +24,32 @@
         android:layout_marginLeft="9dp"
         android:layout_marginTop="31dp"
         android:src="@drawable/ic_back"/>
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="74.1dp">
 
-        <ImageView
-            android:id="@+id/thumb_button_1"
-            android:layout_width="115dp"
-            android:layout_height="166.8dp"
-            android:layout_marginLeft="13dp"
-            android:src="@drawable/picture_demo"
-            android:scaleType="centerCrop"/>
 
-        <ImageView
-            android:id="@+id/picture_button"
-            android:layout_width="31dp"
-            android:layout_height="31dp"
-            android:layout_marginLeft="12dp"
-            android:layout_marginTop="1.9dp"
-            android:src="@drawable/ic_enlarge_picture"
-            android:onClick="pictureControl"/>
-    </FrameLayout>
+    <ImageView
+        android:id="@+id/thumb_button_1"
+        android:layout_width="115dp"
+        android:layout_height="166.8dp"
+        android:layout_marginLeft="13dp"
+        android:layout_marginTop="74.1dp"
+        android:src="@drawable/picture_demo"
+        />
+
+    <ImageView
+        android:id="@+id/picture_button"
+        android:layout_width="31dp"
+        android:layout_height="31dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="76dp"
+        android:src="@drawable/ic_enlarge_picture"
+        android:onClick="pictureControl"/>
+
 
     <ImageView
         android:id="@+id/expanded_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone" />
+        android:visibility="invisible" />
 
 
     <ImageView
@@ -186,16 +184,6 @@
         android:layout_marginBottom="47dp"
         android:visibility="gone"/>
 
-    <!--<com.example.magidemo.CircleProgressBar-->
-        <!--android:id="@+id/custom_progressBar"-->
-        <!--android:layout_height="100dp"-->
-        <!--android:layout_width="100dp"-->
-        <!--app:progress="0"-->
-        <!--app:progressBarThickness="7dp"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--android:layout_centerInParent="true"-->
-        <!--android:layout_marginBottom="10dp"/>-->
-
 </RelativeLayout>
 
     <FrameLayout
@@ -210,39 +198,13 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <com.example.magidemo.StickerView
-                android:id="@+id/sticker_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                app:showBorder="true"
-                app:showIcons="true">
+            <VideoView
+                android:id="@+id/captured_video"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:visibility="gone"
+                android:layout_gravity="center"/>
 
-                <ImageView
-                    android:id="@+id/captured_image"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:visibility="gone"
-                    android:background="@color/black"/>
-            </com.example.magidemo.StickerView>
-
-            <com.example.magidemo.StickerView
-                android:id="@+id/sticker_view1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                app:showBorder="true"
-                app:showIcons="true"
-                android:background="@color/black">
-                <VideoView
-                    android:id="@+id/captured_video"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:visibility="gone"
-                    android:layout_gravity="center"/>
-            </com.example.magidemo.StickerView>
         </RelativeLayout>
 
         <RelativeLayout
@@ -250,141 +212,25 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-            <ImageView
+                <ImageView
                 android:id="@+id/cancel_capture"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_close_shadow_48dp"
                 android:padding="3dp"/>
-            <!--<ImageView-->
-                <!--android:id="@+id/add_stickers"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_alignParentBottom="true"-->
-                <!--android:layout_alignParentLeft="true"-->
-                <!--android:layout_marginLeft="75dp"-->
-                <!--android:layout_marginBottom="-8dp"-->
-                <!--android:src="@drawable/ic_smile_shadow_48dp"-->
-                <!--android:padding="10dp"/>-->
-            <!--<ImageView-->
-                <!--android:id="@+id/add_text"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_alignParentBottom="true"-->
-                <!--android:layout_alignParentLeft="true"-->
-                <!--android:layout_marginLeft="40dp"-->
-                <!--android:src="@drawable/ic_text_shadow_48dp"-->
-                <!--android:padding="3dp"/>-->
-            <ImageView
-                android:id="@+id/add_draw"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="0dp"
-                android:src="@drawable/ic_graffiti_shadow_48dp"
-                android:padding="3dp"
-                android:visibility="gone" />
-            <ImageView
-                android:id="@+id/save_media"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"
-                android:src="@drawable/ic_download_shadow_48dp"
-                android:padding="5dp"
-                android:layout_marginBottom="-5dp"
-                android:clickable="true"
-                android:onClick="saveMedia"/>
-            <TextView
-                android:id="@+id/upload_media_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:textColor="@color/white"
-                android:padding="3dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginBottom="5dp" />
-            </RelativeLayout>
 
-            <LinearLayout
-                android:id="@+id/editTextLayout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:background="@color/translucent_black_bg"
-                android:gravity="center"
-                android:onClick="showHideEditText"
-                android:clickable="true"
-                android:visibility="gone">
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <ImageView
+                    android:id="@+id/save_media"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="0dp"
-                    android:gravity="center">
-                <SeekBar
-                    android:id="@+id/seekbar_font"
-                    android:layout_width="300dp"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="1dp"/>
-                <View
-                    android:id="@+id/colorSelected"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:background="@color/white"
-                    android:layout_marginLeft="0dp"
-                    android:layout_marginTop="5dp"/>
-                </LinearLayout>
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:src="@drawable/ic_download_shadow_48dp"
+                    android:padding="5dp"
+                    android:layout_marginBottom="-5dp"
+                    android:clickable="true"
+                    android:onClick="saveMedia"/>
 
-                <EditText
-                    android:id="@+id/editText"
-                    android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:gravity="center_vertical|center_horizontal"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:background="@android:color/transparent"
-                    android:textSize="30sp"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/select_sticker"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:background="#e1ffffff"
-                android:visibility="gone">
-                <GridView
-                    android:id="@+id/sticker_grid"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:fadingEdge="none"
-                    android:horizontalSpacing="2dp"
-                    android:verticalSpacing="2dp"
-                    android:focusable="false"
-                    android:numColumns="3"
-                    android:scrollbarStyle="outsideOverlay"
-                    android:scrollbars="none"
-                    android:stretchMode="spacingWidthUniform"
-                    android:columnWidth="100dp"
-                    android:gravity="center_vertical"/>
-                <TextView
-                    android:id="@+id/hide_sticker_options"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="-50dp"
-                    android:text="Cancel"
-                    android:textSize="20dp"
-                    android:gravity="center"
-                    android:background="@color/white"
-                    android:visibility="gone"/>
-            </LinearLayout>
         </RelativeLayout>
     </FrameLayout>
 

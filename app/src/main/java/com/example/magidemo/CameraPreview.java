@@ -73,7 +73,6 @@ import java.util.TimerTask;
 //import android.support.v7.app.AlertDialog;
 
 public class CameraPreview extends Activity {
-//public class CameraPreview extends MyCanvas {
 
     private SurfaceView preview=null;
     private SurfaceHolder previewHolder=null;
@@ -88,10 +87,9 @@ public class CameraPreview extends Activity {
 
     private MediaRecorder mediaRecorder;
     private static int currentCameraId = 0;
-    private Bitmap rotatedBitmap;
+//    private Bitmap rotatedBitmap;
     private RelativeLayout captureMedia;
     private FrameLayout editMedia;
-//    private CircleProgressBar customButton;
 
     private ImageView recordVideo;
     private ImageView stopRecord;
@@ -101,22 +99,14 @@ public class CameraPreview extends Activity {
 
     private ImageView pictureButton;
 
-    private ImageView uploadButton;
-    private TextView uploadButtonTxt;
     private ImageView EditCaptureSwitchBtn;
-    private LinearLayout editTextBody;
-    private ImageView capturedImage;
+
     private VideoView videoView;
     int VideoSeconds = 1;
-    int noti_id;
+//    int noti_id;
 
     private ImageView guide;
     private ImageView timer;
-
-    private View inflate;
-    private TextView choosePhoto;
-    private TextView takePhoto;
-    private Dialog dialog;
 
     public File dir;
     public String defaultVideo;
@@ -153,7 +143,6 @@ public class CameraPreview extends Activity {
 
         captureMedia = (RelativeLayout) findViewById(R.id.camera_view);
         editMedia = (FrameLayout) findViewById(R.id.edit_media);
-//        customButton = (CircleProgressBar) findViewById(R.id.custom_progressBar);
 
         recordVideo = (ImageView) findViewById(R.id.record_video);
         stopRecord = (ImageView) findViewById(R.id.stop_record);
@@ -163,20 +152,14 @@ public class CameraPreview extends Activity {
 
         pictureButton = (ImageView) findViewById(R.id.picture_button);
 
-        //uploadButton = (ImageView) findViewById(R.id.upload_media);
-        uploadButtonTxt = (TextView) findViewById(R.id.upload_media_txt);
-        uploadButtonTxt.setText("");
-        editTextBody = (LinearLayout) findViewById(R.id.editTextLayout);
-        //selectSticker  = (LinearLayout) findViewById(R.id.select_sticker);
-//        ImageView addText = (ImageView) findViewById(R.id.add_text);
-//        ImageView addSticker = (ImageView) findViewById(R.id.add_stickers);
+
         isRecording = false;
         isFlashOn = false;
 
         isPictureEnlarge = false;
 
         EditCaptureSwitchBtn = (ImageView) findViewById(R.id.cancel_capture);
-        capturedImage = (ImageView) findViewById(R.id.captured_image);
+
         videoView = (VideoView) findViewById(R.id.captured_video);
 
         preview=(SurfaceView)findViewById(R.id.preview);
@@ -184,7 +167,7 @@ public class CameraPreview extends Activity {
         previewHolder.addCallback(surfaceCallback);
         previewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
-        noti_id = (int) ((new Date().getTime()/1000L)%Integer.MAX_VALUE);
+//        noti_id = (int) ((new Date().getTime()/1000L)%Integer.MAX_VALUE);
 
         guide = (ImageView)findViewById(R.id.img_guide);
         timer = (ImageView)findViewById(R.id.img_timer);
@@ -207,26 +190,19 @@ public class CameraPreview extends Activity {
             }
         }
 
-//        uploadButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                //perform upload function here
-//            }
-//        });
 
+        //开始录像
         recordVideo.setOnClickListener(new View.OnClickListener() {
 
             private Timer timer = new Timer();
             private long LONG_PRESS_TIMEOUT = 1000;
-            private boolean wasLong = false;
+//            private boolean wasLong = false;
 
             @Override
             public void onClick(View v) {
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        wasLong = true;
-                        // touch & hold was long
                         Log.i("Click","touch & hold was long");
                         VideoCountDown.start();
                         try {
@@ -245,93 +221,20 @@ public class CameraPreview extends Activity {
             }
         });
 
+        //停止录像
         stopRecord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 stopRecording();
                 VideoCountDown.cancel();
                 VideoSeconds = 1;
-                //customButton.setProgressWithAnimation(0);
-                //wasLong = false;
 
                 stopRecord.setVisibility(View.GONE);
                 recordVideo.setVisibility(View.VISIBLE);
             }
         });
 
-        /*
-        customButton.setOnTouchListener(new View.OnTouchListener() {
 
-            private Timer timer = new Timer();
-            private long LONG_PRESS_TIMEOUT = 1000;
-            private boolean wasLong = false;
-
-
-
-            @SuppressLint("ClickableViewAccessibility")
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                Log.d(getClass().getName(), "touch event: " + event.toString());
-
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    // touch & hold started
-                    timer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            wasLong = true;
-                            // touch & hold was long
-                            Log.i("Click","touch & hold was long");
-                            VideoCountDown.start();
-                            try {
-                                startRecording();
-                            } catch (IOException e) {
-                                String message = e.getMessage();
-                                Log.i(null, "Problem " + message);
-                                mediaRecorder.release();
-                                e.printStackTrace();
-                            }
-                        }
-                    }, LONG_PRESS_TIMEOUT);
-                    return true;
-                }
-
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    // touch & hold stopped
-                    timer.cancel();
-                    if(!wasLong){
-                        // touch & hold was short
-                        Log.i("Click","touch & hold was short");
-                        if (isFlashOn && currentCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
-                            params = camera.getParameters();
-                            params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                            camera.setParameters(params);
-
-                            camera.autoFocus(new Camera.AutoFocusCallback() {
-
-                                @Override
-                                public void onAutoFocus(final boolean success, final Camera camera) {
-                                    takePicture();
-                                }
-                            });
-
-                        } else {
-                            takePicture();
-                        }
-                    } else {
-                        stopRecording();
-                        VideoCountDown.cancel();
-                        VideoSeconds = 1;
-                        customButton.setProgressWithAnimation(0);
-                        wasLong = false;
-                    }
-                    timer = new Timer();
-                    return true;
-                }
-
-                return false;
-            }
-        });
-        */
 
         //点击preview调用聚焦方法
         preview.setOnClickListener(new View.OnClickListener() {
@@ -373,32 +276,9 @@ public class CameraPreview extends Activity {
             }
         });
 
-        /*
-        editTextBody.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {showHideEditText();
-            }
-        });
-        addText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {showHideEditText();
-            }
-        });
-        addSticker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                stickerOptions();
-            }
-        });
-        editMedia.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //StickerView.invalidate();
-            }
-        });
-        */
     }//onCreate
 
+    //获取权限
     @SuppressLint("NewApi")
     public void GetPermission() {
 
@@ -427,7 +307,7 @@ public class CameraPreview extends Activity {
         @Override
         public void onTick(long millisUntilFinished) {
             VideoSeconds++;
-            int VideoSecondsPercentage = VideoSeconds * 10;
+//            int VideoSecondsPercentage = VideoSeconds * 10;
 //            customButton.setProgressWithAnimation(VideoSecondsPercentage);
         }
 
@@ -454,6 +334,7 @@ public class CameraPreview extends Activity {
     }
 
     //拍照片
+    /*
     private void takePicture() {
         params = camera.getParameters();
         List<Camera.Size> sizes = params.getSupportedPictureSizes();
@@ -489,14 +370,14 @@ public class CameraPreview extends Activity {
                 }
                 bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                 rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                /*} else {
+                } else {
                     rotatedBitmap = bitmap;
-                }*/
+                }
 
                 if (rotatedBitmap != null) {
                     //setStickerView(0);
-                    capturedImage.setVisibility(View.VISIBLE);
-                    capturedImage.setImageBitmap(rotatedBitmap);
+//                    capturedImage.setVisibility(View.VISIBLE);
+//                    capturedImage.setImageBitmap(rotatedBitmap);
                     editMedia.setVisibility(View.VISIBLE);
                     captureMedia.setVisibility(View.GONE);
 
@@ -511,6 +392,7 @@ public class CameraPreview extends Activity {
             }
         });
     }
+    */
 
     //开始拍摄
     protected void startRecording() throws IOException {
@@ -585,7 +467,7 @@ public class CameraPreview extends Activity {
                 playVideo();
             } catch (RuntimeException stopException) {
                 Log.i("Stop Recoding", "Too short video");
-                takePicture();
+//                takePicture();
             }
             camera.lock();
         } else {
@@ -593,6 +475,8 @@ public class CameraPreview extends Activity {
         }
     }
 
+
+    //循环播放拍摄视频
     public void playVideo() {
         videoView.setVisibility(View.VISIBLE);
         editMedia.setVisibility(View.VISIBLE);
@@ -608,9 +492,9 @@ public class CameraPreview extends Activity {
         });
         videoView.start();
         preview.setVisibility(View.INVISIBLE);
-        //setStickerView(1);
     }
 
+    //保存视频
     public void saveMedia(View v) throws IOException {
         if (!videoView.isShown()) {
             Toast.makeText(this, "Saving...",Toast.LENGTH_SHORT).show();
@@ -676,11 +560,7 @@ public class CameraPreview extends Activity {
                     .create();
             alert.setTitle("Error");
             alert.setMessage("Sorry, your device doesn't support flash light!");
-//            alert.setButton("OK", new DialogInterface.OnClickListener() {
-//                public void onClick(DialogInterface dialog, int which) {
-//                    finish();
-//                }
-//            });
+
             alert.show();
             return;
         } else {
@@ -698,14 +578,16 @@ public class CameraPreview extends Activity {
         }
     }
 
-    //图片放大缩小控制
+    //图片动画放大缩小控制
     public void pictureControl(View v) {
 
         final View thumb1View = findViewById(R.id.thumb_button_1);
 
         float startScale = 0f;
         final ImageView expandedImageView = (ImageView) findViewById(R.id.expanded_image);
+        expandedImageView.setImageResource(R.drawable.picture_demo);
         final Rect startBounds = new Rect();
+        thumb1View.getGlobalVisibleRect(startBounds);
 
 
         Log.i("picture", "picture button clicked!");
@@ -750,7 +632,7 @@ public class CameraPreview extends Activity {
         // view. Also set the container view's offset as the origin for the
         // bounds, since that's the origin for the positioning animation
         // properties (X, Y).
-        thumb1View.getGlobalVisibleRect(startBounds);
+
         findViewById(R.id.container)
                 .getGlobalVisibleRect(finalBounds, globalOffset);
         startBounds.offset(-globalOffset.x, -globalOffset.y);
@@ -825,7 +707,7 @@ public class CameraPreview extends Activity {
         // Upon clicking the zoomed-in image, it should zoom back down
         // to the original bounds and show the thumbnail instead of
         // the expanded image.
-        final float startScaleFinal = startScale;
+//        final float startScaleFinal = startScale;
 
         if (currentAnimator != null) {
             currentAnimator.cancel();
@@ -841,10 +723,10 @@ public class CameraPreview extends Activity {
                                 View.Y,startBounds.top))
                 .with(ObjectAnimator
                         .ofFloat(expandedImageView,
-                                View.SCALE_X, startScaleFinal))
+                                View.SCALE_X, startScale))
                 .with(ObjectAnimator
                         .ofFloat(expandedImageView,
-                                View.SCALE_Y, startScaleFinal))
+                                View.SCALE_Y, startScale))
                 .with(ObjectAnimator.ofFloat(expandedImageView, "alpha", 0.3f, 1f));;
         set.setDuration(shortAnimationDuration);
         set.setInterpolator(new DecelerateInterpolator());
@@ -867,6 +749,7 @@ public class CameraPreview extends Activity {
         currentAnimator = set;
     }
 
+    //转换摄像头
     public void switchCamera() {
         if (!isRecording) {
             if (camera.getNumberOfCameras() != 1) {
@@ -950,7 +833,7 @@ public class CameraPreview extends Activity {
     public void showGuide() {
         View view = LayoutInflater.from(this).inflate(R.layout.guide_dialog,null,false);
 
-        AlertDialog.Builder guideDialog = new AlertDialog.Builder(CameraPreview.this);
+        AlertDialog.Builder guideDialog = new AlertDialog.Builder(CameraPreview.this,R.style.MyDialog);
         guideDialog.setView(view);//加载进去
         final AlertDialog dialog = guideDialog.create();
 
@@ -960,15 +843,15 @@ public class CameraPreview extends Activity {
         video_view.setMediaController(mediaController);
         //下面android.resource://是固定的，com.example.work是包名，R.raw.sw是你raw文件夹下的视频文件
         video_view.setVideoURI(Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.deng_ziqi));
-        dialog.show();
-        video_view.start();
-        //自定义的东西
-//        Window dialogWindow = dialog.getWindow();
-//        WindowManager.LayoutParams lp = dialogWindow.getAttributes();
-//        dialogWindow.setGravity(Gravity.CENTER);
-//        dialogWindow.setAttributes(lp);
 
-        cancle_video.setVisibility(View.VISIBLE);
+
+        dialog.show();
+
+        Window dialogWindow = dialog.getWindow();
+        dialogWindow.setBackgroundDrawableResource(R.color.transparent);
+
+        video_view.start();
+
         cancle_video.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -977,30 +860,15 @@ public class CameraPreview extends Activity {
         });
     }
 
+
     public void EditCaptureSwitch() {
         preview.setVisibility(View.VISIBLE);
         captureMedia.setVisibility(View.VISIBLE);
-        //capturedImage.setImageResource(android.R.color.transparent);
         startPreview(); //onResume();
-        capturedImage.setVisibility(View.GONE);
         editMedia.setVisibility(View.GONE);
         videoView.setVisibility(View.GONE);
     }
-    /*
-    @Override
-    public void onBackPressed() {
-        if (selectSticker.getVisibility() == View.VISIBLE) {
-            stickerOptions();
-        } else if(editTextBody.getVisibility() == View.VISIBLE) {
-            showHideEditText();
-        } else if (editMedia.getVisibility() == View.VISIBLE) {
-            EditCaptureSwitch();
-            removeAllStickers();
-        } else {
-            finish();
-        }
-    }
-    */
+
     @SuppressLint("NewApi")
     @Override
     public void onResume() {
