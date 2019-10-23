@@ -99,7 +99,7 @@ public class CameraPreview extends Activity {
     private ImageView switchCameraBtn;
     private ImageView flashButton;
 
-    private ImageView pictureButton;
+    private Button pictureButton;
 
     private ImageView EditCaptureSwitchBtn;
 
@@ -135,6 +135,8 @@ public class CameraPreview extends Activity {
     private static final int EXPAND_IMAGE = 1;
     private static final int SHRINK_IMAGE = 2;
 
+    private static final int SHOW_GUIDE = 3;
+
     private Handler handler = new Handler() {
         public  void  handleMessage(Message msg) {
             switch (msg.what) {
@@ -143,6 +145,10 @@ public class CameraPreview extends Activity {
                     break;
                 case SHRINK_IMAGE:
                     shrinkImageView(thumb1View,startScale,expandedImageView,startBounds);
+                    break;
+                case SHOW_GUIDE:
+//                    showGuide();
+                    showGuide1();
                     break;
                 default :
                     break;
@@ -185,7 +191,7 @@ public class CameraPreview extends Activity {
         switchCameraBtn = (ImageView) findViewById(R.id.img_switch_camera);
         flashButton = (ImageView) findViewById(R.id.img_flash_control);
 
-        pictureButton = (ImageView) findViewById(R.id.picture_button);
+        pictureButton = (Button) findViewById(R.id.picture_button);
 
 
         isRecording = false;
@@ -287,7 +293,15 @@ public class CameraPreview extends Activity {
         guide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showGuide();
+                new Thread (new Runnable() {
+                    @Override
+                    public void run() {
+                        Message message = new Message();
+                        message.what = SHOW_GUIDE;
+                        handler.sendMessage(message);
+                    }
+                }).start();
+//                showGuide();
             }
         });
 
@@ -615,7 +629,7 @@ public class CameraPreview extends Activity {
         Log.i("picture", "picture button clicked!");
         if(!isPictureEnlarge) {
             isPictureEnlarge = true;
-            pictureButton.setImageResource(R.drawable.ic_shrink_picture);
+
 
             new Thread (new Runnable() {
                 @Override
@@ -626,10 +640,12 @@ public class CameraPreview extends Activity {
                 }
             }).start();
 
+            pictureButton.setBackgroundResource(R.drawable.ic_shrink_picture);
+            pictureButton.bringToFront();
+
             Log.i("picture","picture enlarged");
         } else {
             isPictureEnlarge = false;
-            pictureButton.setImageResource(R.drawable.ic_enlarge_picture);
 
             new Thread (new Runnable() {
                 @Override
@@ -639,6 +655,9 @@ public class CameraPreview extends Activity {
                     handler.sendMessage(message);
                 }
             }).start();
+
+            pictureButton.setBackgroundResource(R.drawable.ic_enlarge_picture);
+            pictureButton.bringToFront();
 
             Log.i("picture","picture shrinked");
         }
@@ -908,10 +927,7 @@ public class CameraPreview extends Activity {
     public void showGuide() {
         View view = LayoutInflater.from(this).inflate(R.layout.guide_dialog,null,false);
 
-        AlertDialog.Builder guideDialog = new AlertDialog.Builder(CameraPreview.this);
-        guideDialog.setView(view);//加载进去
-        final AlertDialog dialog = guideDialog.create();
-
+        //找到对应控件实例
         VideoView video_view = (VideoView) view.findViewById(R.id.video_guide);
         ImageView cancle_video = (ImageView) view.findViewById(R.id.cancel_video);
 
@@ -919,6 +935,9 @@ public class CameraPreview extends Activity {
         //下面android.resource://是固定的，com.example.work是包名，R.raw.sw是你raw文件夹下的视频文件
         video_view.setVideoURI(Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.deng_ziqi));
 
+        AlertDialog.Builder guideDialog = new AlertDialog.Builder(CameraPreview.this);
+        guideDialog.setView(view);//加载进去
+        final AlertDialog dialog = guideDialog.create();
 
         dialog.show();
 
@@ -930,6 +949,25 @@ public class CameraPreview extends Activity {
                 dialog.dismiss();
             }
         });
+    }
+
+    public void showGuide1() {
+        Log.i("showGuide1","showGuide1开始");
+        View view = LayoutInflater.from(this).inflate(R.layout.guide1_dialog,null,false);
+        VideoView video_view = (VideoView) view.findViewById(R.id.guide1_image);
+        video_view.setVideoURI(Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.deng_ziqi));
+        video_view.setMediaController(mediaController);
+
+        video_view.start();
+
+        AlertDialog.Builder guideDialog = new AlertDialog.Builder(CameraPreview.this);
+        guideDialog.setView(view);//加载进去
+        final AlertDialog dialog = guideDialog.create();
+
+        dialog.show();
+
+        Log.i("showGuide1","showGuide1结束");
+
     }
 
 
