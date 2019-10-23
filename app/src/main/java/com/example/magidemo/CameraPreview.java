@@ -29,6 +29,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Display;
@@ -122,6 +124,32 @@ public class CameraPreview extends Activity {
     // very frequently.
     private int shortAnimationDuration;
 
+    float startScale = 0f;
+    private View thumb1View;
+
+    private ImageView expandedImageView;
+
+    private Rect startBounds;
+
+
+    private static final int EXPAND_IMAGE = 1;
+    private static final int SHRINK_IMAGE = 2;
+
+    private Handler handler = new Handler() {
+        public  void  handleMessage(Message msg) {
+            switch (msg.what) {
+                case EXPAND_IMAGE:
+                    expandImageView(thumb1View,startScale,expandedImageView,startBounds);
+                    break;
+                case SHRINK_IMAGE:
+                    shrinkImageView(thumb1View,startScale,expandedImageView,startBounds);
+                    break;
+                default :
+                    break;
+            }
+        }
+    };
+
 
 
     @Override
@@ -138,6 +166,14 @@ public class CameraPreview extends Activity {
 
         // Retrieve and cache the system's default "short" animation time.
         shortAnimationDuration = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+        thumb1View = findViewById(R.id.thumb_button_1);
+
+
+        expandedImageView = (ImageView) findViewById(R.id.expanded_image);
+//        expandedImageView.(R.drawable.picture_demo);
+        startBounds = new Rect();
+        thumb1View.getGlobalVisibleRect(startBounds);
 
 
         captureMedia = (RelativeLayout) findViewById(R.id.camera_view);
@@ -576,29 +612,33 @@ public class CameraPreview extends Activity {
     //图片动画放大缩小控制
     public void pictureControl(View v) {
 
-        final View thumb1View = findViewById(R.id.thumb_button_1);
-
-        float startScale = 0f;
-        final ImageView expandedImageView = (ImageView) findViewById(R.id.expanded_image);
-        expandedImageView.setImageResource(R.drawable.picture_demo);
-        final Rect startBounds = new Rect();
-        thumb1View.getGlobalVisibleRect(startBounds);
-
-
         Log.i("picture", "picture button clicked!");
         if(!isPictureEnlarge) {
             isPictureEnlarge = true;
             pictureButton.setImageResource(R.drawable.ic_shrink_picture);
 
-            expandImageView(thumb1View,startScale,expandedImageView,startBounds);
+            new Thread (new Runnable() {
+                @Override
+                public void run() {
+                    Message message = new Message();
+                    message.what = EXPAND_IMAGE;
+                    handler.sendMessage(message);
+                }
+            }).start();
 
             Log.i("picture","picture enlarged");
         } else {
             isPictureEnlarge = false;
             pictureButton.setImageResource(R.drawable.ic_enlarge_picture);
 
-            shrinkImageView(thumb1View,startScale,expandedImageView,startBounds);
-
+            new Thread (new Runnable() {
+                @Override
+                public void run() {
+                    Message message = new Message();
+                    message.what = SHRINK_IMAGE;
+                    handler.sendMessage(message);
+                }
+            }).start();
 
             Log.i("picture","picture shrinked");
         }
@@ -615,6 +655,7 @@ public class CameraPreview extends Activity {
         // Load the high-resolution "zoomed-in" image.
 //            final ImageView expandedImageView = (ImageView) findViewById(R.id.expanded_image);
         expandedImageView.setImageResource(R.drawable.picture_demo);
+        expandedImageView.setScaleType(ImageView.ScaleType.FIT_XY);
 
         // Calculate the starting and ending bounds for the zoomed-in image.
         // This step involves lots of math. Yay, math.

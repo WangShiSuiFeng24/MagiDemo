@@ -31,9 +31,8 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="13dp"
         android:layout_marginTop="74.1dp"
-
-        app:cardCornerRadius="7.2dp"
-        app:cardElevation="20dp" >
+        app:cardCornerRadius="7.2dp">
+<!--        app:cardElevation="20dp" >-->
 
         <ImageView
             android:layout_width="115dp"
