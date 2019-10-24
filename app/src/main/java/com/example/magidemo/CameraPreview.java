@@ -12,13 +12,11 @@ import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
+
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.hardware.Camera;
@@ -33,10 +31,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-import android.view.Display;
+
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
+
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -47,15 +45,13 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+
 import android.widget.MediaController;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
+
 import android.widget.Toast;
 import android.widget.VideoView;
 
-
-//import androidx.core.app.ActivityCompat;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -72,7 +68,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-//import android.support.v7.app.AlertDialog;
+
 
 public class CameraPreview extends Activity {
 
@@ -89,7 +85,7 @@ public class CameraPreview extends Activity {
 
     private MediaRecorder mediaRecorder;
     private static int currentCameraId = 0;
-//    private Bitmap rotatedBitmap;
+
     private RelativeLayout captureMedia;
     private FrameLayout editMedia;
 
@@ -124,12 +120,6 @@ public class CameraPreview extends Activity {
     // very frequently.
     private int shortAnimationDuration;
 
-    float startScale = 0f;
-    private View thumb1View;
-
-    private ImageView expandedImageView;
-
-    private Rect startBounds;
 
 
     private static final int EXPAND_IMAGE = 1;
@@ -141,14 +131,14 @@ public class CameraPreview extends Activity {
         public  void  handleMessage(Message msg) {
             switch (msg.what) {
                 case EXPAND_IMAGE:
-                    expandImageView(thumb1View,startScale,expandedImageView,startBounds);
+                    expandImageView();
                     break;
                 case SHRINK_IMAGE:
-                    shrinkImageView(thumb1View,startScale,expandedImageView,startBounds);
+                    shrinkImageView();
                     break;
                 case SHOW_GUIDE:
 //                    showGuide();
-                    showGuide1();
+                    showGuide();
                     break;
                 default :
                     break;
@@ -164,23 +154,9 @@ public class CameraPreview extends Activity {
         setContentView(R.layout.camera_preview);
         GetPermission();
 
-        // Hook up clicks on the thumbnail views.
-
-//        final View thumb1View = findViewById(R.id.thumb_button_1);
-//        View thumb1View = findViewById(R.id.thumb_button_1);
-
 
         // Retrieve and cache the system's default "short" animation time.
         shortAnimationDuration = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-        thumb1View = findViewById(R.id.thumb_button_1);
-
-
-        expandedImageView = (ImageView) findViewById(R.id.expanded_image);
-//        expandedImageView.(R.drawable.picture_demo);
-        startBounds = new Rect();
-        thumb1View.getGlobalVisibleRect(startBounds);
-
 
         captureMedia = (RelativeLayout) findViewById(R.id.camera_view);
         editMedia = (FrameLayout) findViewById(R.id.edit_media);
@@ -219,6 +195,8 @@ public class CameraPreview extends Activity {
         }
         defaultVideo =  dir + "/defaultVideo.mp4.nomedia";
         File createDefault = new File(defaultVideo);
+        Log.i("defaultVideo path:",defaultVideo);
+
         if (!createDefault.isFile()) {
             try {
                 FileWriter writeDefault = new FileWriter(createDefault);
@@ -237,9 +215,9 @@ public class CameraPreview extends Activity {
 
             @Override
             public void onClick(View v) {
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
+//                timer.schedule(new TimerTask() {
+//                    @Override
+//                    public void run() {
                         Log.i("Click","touch & hold was long");
                         VideoCountDown.start();
                         try {
@@ -250,8 +228,8 @@ public class CameraPreview extends Activity {
                             mediaRecorder.release();
                             e.printStackTrace();
                         }
-                    }
-                }, LONG_PRESS_TIMEOUT);
+//                    }
+//                }, LONG_PRESS_TIMEOUT);
                 recordVideo.setVisibility(View.GONE);
                 stopRecord.setVisibility(View.VISIBLE);
 
@@ -664,12 +642,17 @@ public class CameraPreview extends Activity {
     }
 
     //动画放大
-    public void expandImageView(final View thumb1View,float startScale,final ImageView expandedImageView,Rect startBounds) {
+    public void expandImageView() {
         // If there's an animation in progress, cancel it
         // immediately and proceed with this one.
         if (currentAnimator != null) {
             currentAnimator.cancel();
         }
+
+        final View thumb1View = findViewById(R.id.thumb_button_1);
+
+        final ImageView expandedImageView = (ImageView) findViewById(R.id.expanded_image);
+
 
         // Load the high-resolution "zoomed-in" image.
 //            final ImageView expandedImageView = (ImageView) findViewById(R.id.expanded_image);
@@ -678,7 +661,7 @@ public class CameraPreview extends Activity {
 
         // Calculate the starting and ending bounds for the zoomed-in image.
         // This step involves lots of math. Yay, math.
-//            final Rect startBounds = new Rect();
+        final Rect startBounds = new Rect();
         final Rect finalBounds = new Rect();
         final Point globalOffset = new Point();
 
@@ -687,20 +670,29 @@ public class CameraPreview extends Activity {
         // view. Also set the container view's offset as the origin for the
         // bounds, since that's the origin for the positioning animation
         // properties (X, Y).
+        findViewById(R.id.thumb_button_1).getGlobalVisibleRect(startBounds);
+        Log.i("thumb startBounds",startBounds.toString());
+
 
         findViewById(R.id.container)
                 .getGlobalVisibleRect(finalBounds, globalOffset);
+        Log.i("container finalBounds",finalBounds.toString());
+        Log.i("container globalOffset",globalOffset.toString());
         startBounds.offset(-globalOffset.x, -globalOffset.y);
         finalBounds.offset(-globalOffset.x, -globalOffset.y);
+        Log.i("offset startBounds",startBounds.toString());
+        Log.i("offset finalbounds",finalBounds.toString());
 
         // Adjust the start bounds to be the same aspect ratio as the final
         // bounds using the "center crop" technique. This prevents undesirable
         // stretching during the animation. Also calculate the start scaling
         // factor (the end scaling factor is always 1.0).
-//            float startScale;
+        float startScale;
         if ((float) finalBounds.width() / finalBounds.height()
                 > (float) startBounds.width() / startBounds.height()) {
             // Extend start bounds horizontally
+            Log.i("startScale","Extend start bounds horizontally");
+
             startScale = (float) startBounds.height() / finalBounds.height();
             float startWidth = startScale * finalBounds.width();
             float deltaWidth = (startWidth - startBounds.width()) / 2;
@@ -708,6 +700,7 @@ public class CameraPreview extends Activity {
             startBounds.right += deltaWidth;
         } else {
             // Extend start bounds vertically
+            Log.i("startScale","Extend start bounds vertically");
             startScale = (float) startBounds.width() / finalBounds.width();
             float startHeight = startScale * finalBounds.height();
             float deltaHeight = (startHeight - startBounds.height()) / 2;
@@ -741,6 +734,7 @@ public class CameraPreview extends Activity {
                         View.SCALE_Y, startScale, 1f))
                 .with(ObjectAnimator.ofFloat(expandedImageView, "alpha", 1f, 0.3f));
         set.setDuration(shortAnimationDuration);
+//        set.setDuration(3000);
         set.setInterpolator(new DecelerateInterpolator());
         set.addListener(new AnimatorListenerAdapter() {
             @Override
@@ -758,7 +752,7 @@ public class CameraPreview extends Activity {
     }
 
     //动画缩小
-    public void shrinkImageView(final View thumb1View,float startScale,final ImageView expandedImageView,Rect startBounds) {
+    public void shrinkImageView() {
         // Upon clicking the zoomed-in image, it should zoom back down
         // to the original bounds and show the thumbnail instead of
         // the expanded image.
@@ -767,6 +761,63 @@ public class CameraPreview extends Activity {
         if (currentAnimator != null) {
             currentAnimator.cancel();
         }
+
+        final View thumb1View = findViewById(R.id.thumb_button_1);
+
+        final ImageView expandedImageView = (ImageView) findViewById(R.id.expanded_image);
+
+        expandedImageView.setImageResource(R.drawable.picture_demo);
+        expandedImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+
+        Rect startBounds = new Rect();
+        final Rect finalBounds = new Rect();
+        final Point globalOffset = new Point();
+        findViewById(R.id.thumb_button_1).getGlobalVisibleRect(startBounds);
+
+        findViewById(R.id.container)
+                .getGlobalVisibleRect(finalBounds, globalOffset);
+//        Log.i("container finalBounds",finalBounds.toString());
+//        Log.i("container globalOffset",globalOffset.toString());
+        startBounds.offset(-globalOffset.x, -globalOffset.y);
+        finalBounds.offset(-globalOffset.x, -globalOffset.y);
+//        Log.i("offset startBounds",startBounds.toString());
+//        Log.i("offset finalbounds",finalBounds.toString());
+
+        float startScale;
+        if ((float) finalBounds.width() / finalBounds.height()
+                > (float) startBounds.width() / startBounds.height()) {
+            // Extend start bounds horizontally
+            startScale = (float) startBounds.height() / finalBounds.height();
+            float startWidth = startScale * finalBounds.width();
+            float deltaWidth = (startWidth - startBounds.width()) / 2;
+            startBounds.left -= deltaWidth;
+            startBounds.right += deltaWidth;
+            Log.i("horizontal startBounds",startBounds.toString());
+
+        } else {
+            // Extend start bounds vertically
+            startScale = (float) startBounds.width() / finalBounds.width();
+            float startHeight = startScale * finalBounds.height();
+            float deltaHeight = (startHeight - startBounds.height()) / 2;
+            startBounds.top -= deltaHeight;
+            startBounds.bottom += deltaHeight;
+
+            Log.i("vertical startBounds",startBounds.toString());
+        }
+
+
+        // Hide the thumbnail and show the zoomed-in view. When the animation
+        // begins, it will position the zoomed-in view in the place of the
+        // thumbnail.
+        thumb1View.setAlpha(0f);
+        expandedImageView.setVisibility(View.VISIBLE);
+
+        // Set the pivot point for SCALE_X and SCALE_Y transformations
+        // to the top-left corner of the zoomed-in view (the default
+        // is the center of the view).
+        expandedImageView.setPivotX(0f);
+        expandedImageView.setPivotY(0f);
+
 
         // Animate the four positioning/sizing properties in parallel,
         // back to their original values.
@@ -784,6 +835,7 @@ public class CameraPreview extends Activity {
                                 View.SCALE_Y, startScale))
                 .with(ObjectAnimator.ofFloat(expandedImageView, "alpha", 0.3f, 1f));;
         set.setDuration(shortAnimationDuration);
+//        set.setDuration(10000);
         set.setInterpolator(new DecelerateInterpolator());
         set.addListener(new AnimatorListenerAdapter() {
             @Override
@@ -929,7 +981,7 @@ public class CameraPreview extends Activity {
 
         //找到对应控件实例
         VideoView video_view = (VideoView) view.findViewById(R.id.video_guide);
-        ImageView cancle_video = (ImageView) view.findViewById(R.id.cancel_video);
+//        ImageView cancle_video = (ImageView) view.findViewById(R.id.cancel_video);
 
         video_view.setMediaController(mediaController);
         //下面android.resource://是固定的，com.example.work是包名，R.raw.sw是你raw文件夹下的视频文件
@@ -938,17 +990,17 @@ public class CameraPreview extends Activity {
         AlertDialog.Builder guideDialog = new AlertDialog.Builder(CameraPreview.this);
         guideDialog.setView(view);//加载进去
         final AlertDialog dialog = guideDialog.create();
-
+        dialog.getWindow().setBackgroundDrawableResource(R.drawable.bg_corners);
         dialog.show();
 
         video_view.start();
 
-        cancle_video.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
+//        cancle_video.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                dialog.dismiss();
+//            }
+//        });
     }
 
     public void showGuide1() {
