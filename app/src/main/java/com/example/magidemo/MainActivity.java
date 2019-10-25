@@ -1,8 +1,8 @@
 package com.example.magidemo;
 
-/**
- * Created by Andong Ming on 17/10/2019.
- */
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.animation.Animator;
@@ -12,11 +12,9 @@ import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.hardware.Camera;
@@ -29,13 +27,10 @@ import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -46,10 +41,8 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-
 import android.widget.MediaController;
 import android.widget.RelativeLayout;
-
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -70,8 +63,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-
-public class CameraPreview extends Activity {
+public class MainActivity extends AppCompatActivity {
+//public class MainActivity extends Activity {
 
     private SurfaceView preview=null;
     private SurfaceHolder previewHolder=null;
@@ -111,7 +104,6 @@ public class CameraPreview extends Activity {
 
     private MediaController mediaController;
 
-
     // Hold a reference to the current animator,
     // so that it can be canceled mid-way.
     private Animator currentAnimator;
@@ -120,6 +112,8 @@ public class CameraPreview extends Activity {
     // duration is ideal for subtle animations or animations that occur
     // very frequently.
     private int shortAnimationDuration;
+
+    final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
 
 
 
@@ -147,14 +141,13 @@ public class CameraPreview extends Activity {
         }
     };
 
-
-
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.camera_preview);
-        GetPermission();
+        getWindow().setFlags(WindowManager.LayoutParams. FLAG_FULLSCREEN, WindowManager.LayoutParams. FLAG_FULLSCREEN);
+        setContentView(R.layout.activity_main);
 
+        GetPermission();
 
         // Retrieve and cache the system's default "short" animation time.
         shortAnimationDuration = getResources().getInteger(android.R.integer.config_shortAnimTime);
@@ -180,33 +173,70 @@ public class CameraPreview extends Activity {
 
         videoView = (VideoView) findViewById(R.id.captured_video);
 
-        preview=(SurfaceView)findViewById(R.id.preview);
-        previewHolder=preview.getHolder();
+        preview  = (SurfaceView)findViewById(R.id.preview);
+        previewHolder = preview.getHolder();
         previewHolder.addCallback(surfaceCallback);
         previewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
 
         guide = (ImageView)findViewById(R.id.img_guide);
         timer = (ImageView)findViewById(R.id.img_timer);
 
-        //setting dir and VideoFile value
-        File sdCard = Environment.getExternalStorageDirectory();
-        dir = new File(sdCard.getAbsolutePath() + "/Opendp");
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
-        defaultVideo =  dir + "/defaultVideo.mp4.nomedia";
-        File createDefault = new File(defaultVideo);
-        Log.i("defaultVideo path:",defaultVideo);
 
-        if (!createDefault.isFile()) {
-            try {
-                FileWriter writeDefault = new FileWriter(createDefault);
-                writeDefault.append("yy");
-                writeDefault.close();
-                writeDefault.flush();
-            } catch (Exception ex) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            // Do the file write
+
+            //setting dir and VideoFile value
+            File sdCard = Environment.getExternalStorageDirectory();
+//        dir = new File(sdCard.getAbsolutePath() + "/Opendp");
+            dir = new File(sdCard.getAbsolutePath() + "/MagiDemo2");
+
+            if (!dir.exists()) {
+                dir.mkdirs();
             }
+            defaultVideo =  dir + "/defaultVideo.mp4.ming";
+            File createDefault = new File(defaultVideo);
+            Log.i("defaultVideo path:",defaultVideo);
+
+            if (!createDefault.isFile()) {
+                try {
+                    FileWriter writeDefault = new FileWriter(createDefault);
+                    writeDefault.append("yy");
+                    writeDefault.close();
+                    writeDefault.flush();
+                } catch (Exception ex) {
+                }
+            }
+
+        } else {
+            // Request permission from the user
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_ASK_PERMISSIONS);
         }
+
+
+
+//        //setting dir and VideoFile value
+//        File sdCard = Environment.getExternalStorageDirectory();
+////        dir = new File(sdCard.getAbsolutePath() + "/Opendp");
+//        dir = new File(sdCard.getAbsolutePath() + "/MagiDemo2");
+//
+//        if (!dir.exists()) {
+//            dir.mkdirs();
+//        }
+//        defaultVideo =  dir + "/defaultVideo.mp4.ming";
+//        File createDefault = new File(defaultVideo);
+//        Log.i("defaultVideo path:",defaultVideo);
+//
+//        if (!createDefault.isFile()) {
+//            try {
+//                FileWriter writeDefault = new FileWriter(createDefault);
+//                writeDefault.append("yy");
+//                writeDefault.close();
+//                writeDefault.flush();
+//            } catch (Exception ex) {
+//            }
+//        }
 
         //开始录像
         recordVideo.setOnClickListener(new View.OnClickListener() {
@@ -216,9 +246,9 @@ public class CameraPreview extends Activity {
 
             @Override
             public void onClick(View v) {
-//                timer.schedule(new TimerTask() {
-//                    @Override
-//                    public void run() {
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
                         Log.i("Click","touch & hold was long");
                         VideoCountDown.start();
                         try {
@@ -229,8 +259,8 @@ public class CameraPreview extends Activity {
                             mediaRecorder.release();
                             e.printStackTrace();
                         }
-//                    }
-//                }, LONG_PRESS_TIMEOUT);
+                    }
+                }, LONG_PRESS_TIMEOUT);
                 recordVideo.setVisibility(View.GONE);
                 stopRecord.setVisibility(View.VISIBLE);
 
@@ -249,8 +279,6 @@ public class CameraPreview extends Activity {
                 recordVideo.setVisibility(View.VISIBLE);
             }
         });
-
-
 
         //点击preview调用聚焦方法
         preview.setOnClickListener(new View.OnClickListener() {
@@ -299,8 +327,27 @@ public class CameraPreview extends Activity {
                 EditCaptureSwitch();
             }
         });
+    }//onCreate()
 
-    }//onCreate
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_ASK_PERMISSIONS:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission Granted
+                    Toast.makeText(MainActivity.this, "Permission Granted", Toast.LENGTH_SHORT)
+                            .show();
+                } else {
+                    // Permission Denied
+                    Toast.makeText(MainActivity.this, "Permission Denied", Toast.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
 
     //获取权限
     @SuppressLint("NewApi")
@@ -315,6 +362,7 @@ public class CameraPreview extends Activity {
         }
     }
 
+    //是否拥有有权限
     public static boolean hasPermission(Context context, String... permissions) {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
             for (String permission : permissions) {
@@ -357,66 +405,6 @@ public class CameraPreview extends Activity {
         }
     }
 
-    //拍照片
-    /*
-    private void takePicture() {
-        params = camera.getParameters();
-        List<Camera.Size> sizes = params.getSupportedPictureSizes();
-
-        List<Integer> list = new ArrayList<Integer>();
-        for (Camera.Size size : params.getSupportedPictureSizes()) {
-            Log.i("ASDF", "Supported Picture: " + size.width + "x" + size.height);
-            list.add(size.height);
-        }
-
-        Camera.Size cs = sizes.get(closest(1080, list));
-        Log.i("Width x Height", cs.width+"x"+cs.height);
-        params.setPictureSize(cs.width, cs.height); //1920, 1080
-
-        //params.setRotation(90);
-        camera.setParameters(params);
-        camera.takePicture(null, null, new Camera.PictureCallback() {
-
-            @Override
-            public void onPictureTaken(byte[] data, final Camera camera) {
-                Bitmap bitmap;
-                Matrix matrix = new Matrix();
-
-                //if (bitmap.getWidth() > bitmap.getHeight()) {
-                if (currentCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
-                    matrix.postRotate(90);
-                } else {
-                    Matrix matrixMirrory = new Matrix();
-                    float[] mirrory = {-1, 0, 0, 0, 1, 0, 0, 0, 1};
-                    matrixMirrory.setValues(mirrory);
-                    matrix.postConcat(matrixMirrory);
-                    matrix.postRotate(90);
-                }
-                bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                } else {
-                    rotatedBitmap = bitmap;
-                }
-
-                if (rotatedBitmap != null) {
-                    //setStickerView(0);
-//                    capturedImage.setVisibility(View.VISIBLE);
-//                    capturedImage.setImageBitmap(rotatedBitmap);
-                    editMedia.setVisibility(View.VISIBLE);
-                    captureMedia.setVisibility(View.GONE);
-
-                    params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-                    camera.setParameters(params);
-                    Log.i("Image bitmap", rotatedBitmap.toString()+"-");
-                } else {
-                    Toast.makeText(CameraPreview.this, "Failed to Capture the picture. kindly Try Again:",
-                            Toast.LENGTH_LONG).show();
-                }
-
-            }
-        });
-    }
-    */
 
     //开始拍摄
     protected void startRecording() throws IOException {
@@ -499,7 +487,6 @@ public class CameraPreview extends Activity {
         }
     }
 
-
     //循环播放拍摄视频
     public void playVideo() {
         videoView.setVisibility(View.VISIBLE);
@@ -574,13 +561,14 @@ public class CameraPreview extends Activity {
         sendBroadcast(mediaScanIntent);
     }
 
+
     //闪光灯控制
     public void FlashControl(View v) {
         Log.i("Flash", "Flash button clicked!");
         boolean hasFlash = getApplicationContext().getPackageManager()
                 .hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
         if (!hasFlash) {
-            AlertDialog alert = new AlertDialog.Builder(CameraPreview.this)
+            AlertDialog alert = new AlertDialog.Builder(MainActivity.this)
                     .create();
             alert.setTitle("Error");
             alert.setMessage("Sorry, your device doesn't support flash light!");
@@ -880,12 +868,11 @@ public class CameraPreview extends Activity {
         }
     }
 
-
     //弹出Timer对话框
     public void showTimer() {
         View view = LayoutInflater.from(this).inflate(R.layout.timer_dialog,null,false);
 
-        AlertDialog.Builder guideDialog = new AlertDialog.Builder(CameraPreview.this,R.style.MyDialog);
+        AlertDialog.Builder guideDialog = new AlertDialog.Builder(MainActivity.this,R.style.MyDialog);
         guideDialog.setView(view);//加载进去
         final AlertDialog dialog = guideDialog.create();
 
@@ -901,7 +888,7 @@ public class CameraPreview extends Activity {
 
 
         //显示
-       dialog.show();
+        dialog.show();
         //自定义的东
 
         Window dialogWindow = dialog.getWindow();
@@ -988,14 +975,17 @@ public class CameraPreview extends Activity {
         //下面android.resource://是固定的，com.example.work是包名，R.raw.sw是你raw文件夹下的视频文件
         video_view.setVideoURI(Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.deng_ziqi));
 
-        AlertDialog.Builder guideDialog = new AlertDialog.Builder(CameraPreview.this);
+        AlertDialog.Builder guideDialog = new AlertDialog.Builder(MainActivity.this);
         guideDialog.setView(view);//加载进去
         final AlertDialog dialog = guideDialog.create();
-        dialog.getWindow().setBackgroundDrawableResource(R.drawable.bg_corners);
+//        dialog.getWindow().setBackgroundDrawableResource(R.drawable.bg_corners);
         dialog.show();
 
         video_view.start();
+//        video_view.setBackgroundResource(R.drawable.bg_corners);
 
+
+        //设置后dialog不再跳动
         Window window = dialog.getWindow() ;
 //        window.setBackgroundDrawableResource(R.drawable.bg_corners);
         WindowManager m = getWindowManager();
@@ -1006,6 +996,7 @@ public class CameraPreview extends Activity {
         window.setAttributes(p);
 
 
+
         cancle_video.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1014,7 +1005,7 @@ public class CameraPreview extends Activity {
         });
     }
 
-
+    //编辑 捕捉 开关
     public void EditCaptureSwitch() {
         preview.setVisibility(View.VISIBLE);
         captureMedia.setVisibility(View.VISIBLE);
@@ -1080,7 +1071,7 @@ public class CameraPreview extends Activity {
             }
             catch (Throwable t) {
                 Log.e("Preview:surfaceCallback", "Exception in setPreviewDisplay()", t);
-                Toast.makeText(CameraPreview.this, t.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
             }
 
             if (!cameraConfigured) {
@@ -1134,7 +1125,7 @@ public class CameraPreview extends Activity {
         return result;
     }
 
-    SurfaceHolder.Callback surfaceCallback=new SurfaceHolder.Callback() {
+    SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
         public void surfaceCreated(SurfaceHolder holder) {
             // no-op -- wait until surfaceChanged()
         }
@@ -1150,6 +1141,4 @@ public class CameraPreview extends Activity {
             // no-op
         }
     };
-
 }
-

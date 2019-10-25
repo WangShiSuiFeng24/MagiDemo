@@ -2,20 +2,21 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    app:cardElevation="0dp"
+    app:cardElevation="-200dp"
     >
-    <!--    app:cardCornerRadius="17.2dp"-->
-    <!--    app:layout_constraintDimensionRatio="16:9"-->
+<!--    app:cardCornerRadius="17.2dp"-->
+<!--    app:layout_constraintDimensionRatio="16:9"-->
 
 
 
     <!--    <org.videolan.vlc.VlcVideoView-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:id="@+id/video_guide"-->
-    <!--        android:layout_height="match_parent"-->
-    <!--        />-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:id="@+id/video_guide"-->
+<!--        android:layout_height="match_parent"-->
+<!--        />-->
 
     <VideoView
         android:id="@+id/video_guide"
