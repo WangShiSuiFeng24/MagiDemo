@@ -32,6 +32,7 @@ import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 
@@ -981,7 +982,7 @@ public class CameraPreview extends Activity {
 
         //找到对应控件实例
         VideoView video_view = (VideoView) view.findViewById(R.id.video_guide);
-//        ImageView cancle_video = (ImageView) view.findViewById(R.id.cancel_video);
+        ImageView cancle_video = (ImageView) view.findViewById(R.id.cancel_video);
 
         video_view.setMediaController(mediaController);
         //下面android.resource://是固定的，com.example.work是包名，R.raw.sw是你raw文件夹下的视频文件
@@ -995,31 +996,22 @@ public class CameraPreview extends Activity {
 
         video_view.start();
 
-//        cancle_video.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                dialog.dismiss();
-//            }
-//        });
-    }
+        Window window = dialog.getWindow() ;
+//        window.setBackgroundDrawableResource(R.drawable.bg_corners);
+        WindowManager m = getWindowManager();
+        Display d = m.getDefaultDisplay(); // 获取屏幕宽、高用
+        WindowManager.LayoutParams p = window.getAttributes(); // 获取对话框当前的参数值
+        p.height = (int) (d.getHeight() * 0.5); // 改变的是dialog框在屏幕中的位置而不是大小
+        p.width = (int) (d.getWidth() * 0.65); // 宽度设置为屏幕的0.65
+        window.setAttributes(p);
 
-    public void showGuide1() {
-        Log.i("showGuide1","showGuide1开始");
-        View view = LayoutInflater.from(this).inflate(R.layout.guide1_dialog,null,false);
-        VideoView video_view = (VideoView) view.findViewById(R.id.guide1_image);
-        video_view.setVideoURI(Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.deng_ziqi));
-        video_view.setMediaController(mediaController);
 
-        video_view.start();
-
-        AlertDialog.Builder guideDialog = new AlertDialog.Builder(CameraPreview.this);
-        guideDialog.setView(view);//加载进去
-        final AlertDialog dialog = guideDialog.create();
-
-        dialog.show();
-
-        Log.i("showGuide1","showGuide1结束");
-
+        cancle_video.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
     }
 
 
